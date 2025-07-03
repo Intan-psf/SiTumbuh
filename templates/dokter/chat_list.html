@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Dokter - Chat Pasien</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f4f7f6 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            color: #333;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed 100%) !important;
+            color: white !important;
+            border: none !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 18px !important;
+            box-shadow: 0 4px 15px rgba(94, 41, 122, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .toggle-btn:hover {
+            background: linear-gradient(135deg, #4f46e5, #462185 100%) !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 20px rgba(94, 41, 122, 0.3) !important;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+            padding: 80px 0 20px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar.closed {
+            left: -280px;
+        }
+
+        .sidebar-header {
+            padding: 0 25px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .sidebar-header p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin: 5px 0;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0;
+            margin-right: 20px;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar a.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .sidebar .icon {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        /* Content area */
+        .content {
+            margin-left: 280px;
+            padding: 20px;
+            flex-grow: 1;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+            position: relative;
+        }
+
+        .content.fullwidth {
+            margin-left: 0;
+        }
+
+        /* Top Header - Konsisten dengan Dashboard */
+        .top-header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            width: auto;
+            z-index: 99;
+        }
+
+        .top-header.fullwidth-header {
+            left: 80px;
+            width: calc(100% - 100px);
+        }
+
+        .header-left h4 {
+            color: #334155;
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .header-left small {
+            color: #64748b;
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .flash-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .flash-success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Chat List Container - Konsisten dengan Dashboard */
+        .chat-list-container {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-top: 0;
+        }
+
+        .chat-list-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #334155;
+            gap: 15px;
+        }
+
+        .chat-list-header i {
+            color: #7c3aed;
+            font-size: 1.8rem;
+        }
+
+        /* Chat Items */
+        .chat-items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-item {
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .chat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            border-color: rgba(124, 58, 237, 0.3);
+        }
+
+        .chat-item a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            gap: 20px;
+        }
+
+        .chat-item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex-grow: 1;
+        }
+
+        .chat-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .chat-info p {
+            margin: 0;
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .chat-time {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        /* No Chat Sessions */
+        .no-chat-sessions {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .no-chat-sessions i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.closed {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar:not(.closed) {
+                transform: translateX(0);
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 15px;
+                padding-top: 80px;
+            }
+            
+            .toggle-btn {
+                top: 15px !important;
+                left: 15px !important;
+            }
+            
+            .top-header {
+                left: 0;
+                width: calc(100% - 30px);
+                border-radius: 15px;
+                padding: 15px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                position: sticky;
+                top: 0;
+                z-index: 998;
+                margin: 0 15px 20px 15px;
+            }
+            
+            .top-header.fullwidth-header {
+                left: 0;
+                width: calc(100% - 30px);
+            }
+            
+            .chat-list-container {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+            
+            .chat-item {
+                padding: 15px;
+            }
+            
+            .chat-item a {
+                gap: 15px;
+            }
+            
+            .chat-item-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .chat-info h4 {
+                font-size: 1.1rem;
+            }
+            
+            .chat-info p {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Sidebar">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-heartbeat"></i> SiTumbuh</h3>
+            <p>Dokter SiTumbuh</p>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('dokter_dashboard') }}"><i class="fa fa-home icon"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('dokter_chat_list') }}" class="active"><i class="fa fa-comments icon"></i> Chat Pasien</a></li>
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+        <!-- Top Header - Konsisten dengan Dashboard -->
+        <div class="top-header" id="topHeader">
+            <div class="header-left">
+                <h4>Chat Pasien</h4>
+                <small>Kelola percakapan dengan pasien Anda</small>
+            </div>
+            <div class="user-info">
+                <span>{{ session.get('username', 'Dokter') }}</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash-{{ category }}">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Chat List Container -->
+        <div class="chat-list-container fade-in">
+            <div class="chat-list-header">
+                <i class="fas fa-user-friends"></i> Percakapan Aktif
+            </div>
+            <div class="chat-items">
+                {% if chat_sessions %}
+                    {% for session in chat_sessions %}
+                        <div class="chat-item">
+                            <a href="{{ url_for('dokter_chat_room', pembayaran_id=session.pembayaran_id) }}">
+                                <div class="chat-item-icon">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="chat-info">
+                                    <h4>{{ session.user_name }}</h4>
+                                    <p>{{ session.last_message }}</p>
+                                </div>
+                                <div class="chat-time">
+                                    {{ session.last_message_time }}
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-chat-sessions">
+                        <i class="fas fa-comments-slash"></i><br>
+                        Belum ada sesi chat yang aktif.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const topHeader = document.getElementById('topHeader');
+            
+            sidebar.classList.toggle('closed');
+            content.classList.toggle('fullwidth');
+            topHeader.classList.toggle('fullwidth-header');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('closed');
+                document.getElementById('content').classList.add('fullwidth');
+                document.getElementById('topHeader').classList.add('fullwidth-header');
+            } else {
+                document.getElementById('sidebar').classList.remove('closed');
+                document.getElementById('content').classList.remove('fullwidth');
+                document.getElementById('topHeader').classList.remove('fullwidth-header');
+            }
+        });
+
+        // Initialize responsive behavior
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.add('closed');
+            document.getElementById('content').classList.add('fullwidth');
+            document.getElementById('topHeader').classList.add('fullwidth-header');
+        }
+    </script>
+</body>
+</html>

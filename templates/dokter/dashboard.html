@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Dokter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Link ke file CSS yang sudah dioptimasi -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kader-dashboard.css') }}">
+    <style>
+        /* Import existing admin.css styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f4f7f6 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            color: #333;
+        }
+
+        /* Toggle Button - Same as admin.css */
+        .toggle-btn {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            z-index: 9999 !important;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed 100%) !important;
+            color: white !important;
+            border: none !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 18px !important;
+            box-shadow: 0 4px 15px rgba(94, 41, 122, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .toggle-btn:hover {
+            background: linear-gradient(135deg, #4f46e5, #462185 100%) !important;
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 20px rgba(94, 41, 122, 0.3) !important;
+        }
+
+        /* Sidebar - Keep existing styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+            padding: 80px 0 20px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar.closed {
+            left: -280px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin: 5px 0;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 0 25px 25px 0;
+            margin-right: 20px;
+        }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar a.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .sidebar .icon {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        /* Content area - using admin.css pattern */
+        .content {
+            margin-left: 280px;
+            padding: 20px;
+            flex-grow: 1;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+            padding-top: 100px;
+            position: relative;
+        }
+
+        .content.fullwidth {
+            margin-left: 0;
+        }
+
+        /* Top Header - consistent with admin.css */
+        .top-header {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            width: auto;
+            z-index: 99;
+        }
+
+        .top-header.fullwidth-header {
+            left: 80px;
+            width: calc(100% - 100px);
+        }
+
+        .header-left h4 {
+            color: #334155;
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        .header-left small {
+            color: #64748b;
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Dashboard Container - following admin.css pattern */
+        .dashboard-container {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-top: 0;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .flash-info {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .flash-success {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        /* Stats Grid - consistent with admin design */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card-color), var(--card-color-end));
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .stat-card:hover::before {
+            transform: scale(1.2);
+        }
+
+        .stat-card.pink {
+            --card-color: #ec4899;
+            --card-color-end: #be185d;
+        }
+
+        .stat-card.purple {
+            --card-color: #8b5cf6;
+            --card-color-end: #7c3aed;
+        }
+
+        .stat-card.orange {
+            --card-color: #f59e0b;
+            --card-color-end: #d97706;
+        }
+
+        .stat-card i {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+            z-index: 1;
+            position: relative;
+        }
+
+        .stat-card h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+            z-index: 1;
+            position: relative;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 500;
+            opacity: 0.9;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.closed {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar:not(.closed) {
+                transform: translateX(0);
+            }
+            
+            .content {
+                margin-left: 0;
+                padding: 15px;
+                padding-top: 80px;
+            }
+            
+            .toggle-btn {
+                top: 15px;
+                left: 15px;
+            }
+            
+            .top-header {
+                left: 0;
+                width: 100%;
+                border-radius: 0;
+                padding: 15px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                position: sticky;
+                top: 0;
+                z-index: 998;
+            }
+            
+            .top-header.fullwidth-header {
+                left: 0;
+                width: 100%;
+            }
+            
+            .dashboard-container {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Sidebar">☰</button>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-heartbeat"></i> SiTumbuh</h3>
+            <p>Dokter SiTumbuh</p>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('dokter_dashboard') }}" class="active"><i class="fa fa-home icon"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('dokter_chat_list') }}"><i class="fa fa-comments icon"></i> Chat Pasien</a></li>
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+        <!-- Top Header -->
+        <div class="top-header" id="topHeader">
+            <div class="header-left">
+                <h4>Dashboard Dokter</h4>
+                <small>Kelola data pasien dengan mudah</small>
+            </div>
+            <div class="user-info">
+                <span>Selamat Datang, Kader davinakader1</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashboard-container fade-in">
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                <!-- Flash messages would go here -->
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card pink">
+                    <i class="fas fa-users"></i>
+                    <h2>7</h2>
+                    <p>Total Pengguna Terdaftar</p>
+                </div>
+                <div class="stat-card purple">
+                    <i class="fas fa-user-plus"></i>
+                    <h2>3</h2>
+                    <p>Pendaftaran Posyandu</p>
+                </div>
+                <div class="stat-card orange">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h2>4</h2>
+                    <p>Kegiatan Posyandu Dibuat</p>
+                </div>
+            </div>
+
+            <!-- Additional Content Area -->
+            <div style="text-align: center; padding: 40px 0; color: #64748b;">
+                <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 20px; color: #667eea;"></i>
+                <h3 style="color: #1e293b; margin-bottom: 10px;">Statistik Kegiatan</h3>
+                <p>Data statistik kegiatan akan ditampilkan di sini</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            const topHeader = document.getElementById('topHeader');
+            
+            sidebar.classList.toggle('closed');
+            content.classList.toggle('fullwidth');
+            topHeader.classList.toggle('fullwidth-header');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('closed');
+                document.getElementById('content').classList.add('fullwidth');
+                document.getElementById('topHeader').classList.add('fullwidth-header');
+            } else {
+                document.getElementById('sidebar').classList.remove('closed');
+                document.getElementById('content').classList.remove('fullwidth');
+                document.getElementById('topHeader').classList.remove('fullwidth-header');
+            }
+        });
+
+        // Initialize responsive behavior
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.add('closed');
+            document.getElementById('content').classList.add('fullwidth');
+            document.getElementById('topHeader').classList.add('fullwidth-header');
+        }
+    </script>
+</body>
+</html>

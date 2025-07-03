@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cegah Stunting SiTumbuh Website</title>
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"/>
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+  <div id="Beranda"></div>
+   <header>
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SiTumbuh" class="logo" />
+    {% include '_clean_navbar.html' %}
+    <div class="fas fa-bars"></div>
+  </header>
+
+  <section id="home" class="home">
+      <div class="row align-items-start">
+        <div class="col-md-6 images text-center">
+          
+           <img src="{{ url_for('static', filename='img/stunting.png') }}" alt="Illustrasi Cegah Stunting">
+        </div>
+
+        <div  class="col-md-6 content">
+        <p class="tagline">Cegah Stunting Yuk !</p>
+        <h1 class="typing-heading">Bersama Cegah Stunting, Anak Sehat Masa Depan Kuat</h1>
+        <button type="button" class="btn btn-outline-primary tombol-cek" onclick="location.href='/prediksi'">
+          Cek Sekarang
+        </button>
+
+
+
+
+      </div>
+
+      </div>
+   </section>
+
+ 
+     <div class="floating-elements">
+        <div class="floating-circle circle-1"></div>
+        <div class="floating-circle circle-2"></div>
+        <div class="floating-circle circle-3"></div>
+    </div>
+
+    <section class="section__container service__container">
+        <div class="service__header">
+            <div class="service__header__content">
+                <h2 class="section__header">Layanan Kami</h2>
+                <p>
+                    Kunjungi layanan kami di SiTumbuh untuk memastikan anak Anda tumbuh sehat dan optimal dengan monitoring berkualitas tinggi
+                </p>
+            </div>
+        </div>
+    
+        <div class="service__grid">
+            <div class="service__card">
+                <div class="icon-container">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h4>Prediksi Stunting</h4>
+                <p>
+                    Sistem prediksi cerdas berbasis AI untuk mendeteksi dini risiko stunting pada anak dengan akurasi tinggi dan rekomendasi pencegahan yang tepat
+                </p>
+            </div>
+            <div class="service__card">
+                <div class="icon-container">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h4><a href="{{ url_for('doctor') }}">Konsultasi Dokter</a></h4>
+                <p>
+                    Layanan konsultasi online dengan dokter spesialis anak berpengalaman untuk mendampingi tumbuh kembang optimal si kecil
+                </p>
+            </div>
+            <div class="service__card">
+                <div class="icon-container">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <h4>Posyandu Digital</h4>
+                <p>
+                    Platform digital terintegrasi untuk memantau perkembangan anak, jadwal imunisasi, dan koordinasi dengan posyandu terdekat
+                </p>
+            </div>
+        </div>
+    </section>
+
+      <section id="about" class="section__container about__container">
+        <div class="about__content">
+            <h2 class="section__header">Tentang Kami</h2>
+            <p>
+                <span class="highlight">SiTumbuh</span> adalah platform inovatif yang berkomitmen untuk memastikan tumbuh kembang anak Indonesia melalui layanan prediksi stunting, konsultasi dokter, dan pemantauan posyandu yang terintegrasi dengan teknologi modern.
+            </p>
+            <p>
+                Kami percaya bahwa masa depan bangsa dimulai dari anak-anak yang sehat, cerdas, dan bahagia. Mari tumbuh bersama SiTumbuh!
+            </p>
+        </div>
+        <div class="about__image">
+     
+            <img src="{{ url_for('static', filename='img/about.svg') }}" alt="Tentang Kami">
+        </div>
+    </section>
+
+
+      <div id="chatbot">
+        <section class="chat-window">
+            <button class="close">ﾃ�Tutup</button>
+            <div class="chat">
+                <div class="model"><p>Halo! Saya RAISA, asisten virtual SiTumbuh. Ada yang bisa saya bantu tentang kesehatan dan tumbuh kembang anak?</p></div>
+            </div>
+            <div class="input-area">
+                <input type="text" placeholder="Tanya aku tentang apapun..." />
+                <button>豆</button>
+            </div>
+        </section>
+        <div class="chat-button" title="Buka Chat dengan RAISA">
+            <img src="https://cdn-icons-png.flaticon.com/512/6873/6873405.png" alt="Chat" />
+        </div>
+    </div>
+
+
+
+      <div id="livechat">
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <div class="admin-info">
+                    <div class="admin-avatar">捉窶昨汳ｼ</div>
+                    <div class="admin-details">
+                        <div class="admin-name">Admin Support</div>
+                        <div class="admin-status">
+                            <div class="status-dot"></div>
+                            Online
+                        </div>
+                    </div>
+                </div>
+                <button class="close-btn" id="closeBtn">ﾃ�/button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message admin-message">
+                    Halo! Selamat datang di layanan live chat kami. Ada yang bisa saya bantu?
+                    <div class="message-time">10:30</div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                Admin sedang mengetik
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <input 
+                    type="text" 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Ketik pesan Anda..."
+                    maxlength="500"
+                />
+                <button class="send-btn" id="sendBtn">豆</button>
+            </div>
+        </div>
+        
+        <div class="chat-button" id="chatButton" title="Chat dengan Admin">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.959 8.959 0 01-4.906-1.451L3 21l2.451-5.094A8.959 8.959 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z'%3E%3C/path%3E%3C/svg%3E" alt="Chat" />
+            <div class="notification-badge" id="notificationBadge" style="display: none;">1</div>
+        </div>
+    </div>
+
+
+
+   <section>
+        <h2 class="berlangganan">Paket Berlangganan</h2>
+        <div class="pricing">
+            <div class="card-wrapper free">
+                <div class="card-header">
+                    <i class="fas fa-hand-holding-heart icon"></i>
+                    <h2>Gratis</h2>
+                </div>
+                <div class="card-detail">
+                    <p><i class="fas fa-check check"></i> Akses info dasar tentang stunting</p>
+                    <p><i class="fas fa-check check"></i> Artikel edukasi</p>
+                    <p><i class="fas fa-times nocheck"></i> Laporan pertumbuhan anak</p>
+                    <p><i class="fas fa-times nocheck"></i> Konsultasi dengan ahli gizi</p>
+                </div>
+                <div class="card-price">
+                    <p>Rp 0</p>
+                </div>
+                <button class="card-button">Mulai</button>
+            </div>
+
+            <div class="card-wrapper premium">
+                <div class="popular-badge">Terpopuler</div>
+                <div class="card-header">
+                    <i class="fas fa-user-shield icon"></i>
+                    <h2>Premium</h2>
+                </div>
+                <div class="card-detail">
+                    <p><i class="fas fa-check check"></i> Akses info dasar tentang stunting</p>
+                    <p><i class="fas fa-check check"></i> Artikel edukasi</p>
+                    <p><i class="fas fa-check check"></i> Laporan pertumbuhan anak</p>
+                    <p><i class="fas fa-check check"></i> Konsultasi dengan ahli gizi</p>
+                </div>
+                <div class="card-price">
+                    <p>Rp 50.000/bulan</p>
+                </div>
+                <a href="{{ url_for('doctor') }}"><button class="card-button">Upgrade</button></a>
+            </div>
+        </div>
+    </section>
+
+    <script type="importmap">
+{
+  "imports": {
+    "@google/generative-ai": "https://esm.run/@google/generative-ai"
+  }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='navbar.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='chatbot.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typingElement = document.querySelector('.typing-heading');
+        
+        if (typingElement) {
+            const text = typingElement.textContent;
+            typingElement.textContent = '';
+            typingElement.style.opacity = '1';
+            
+            let i = 0;
+            const cursor = document.createElement('span');
+            cursor.textContent = '|';
+            cursor.style.animation = 'blink 1s infinite';
+            cursor.style.fontSize = 'inherit';
+            cursor.style.color = 'var(--blue)';
+            
+            // CSS untuk cursor blinking
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes blink {
+                    0%, 50% { opacity: 1; }
+                    51%, 100% { opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            function typeWriter() {
+                if (i < text.length) {
+                    typingElement.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 80); // Kecepatan typing (ms)
+                } else {
+                    // Tambahkan cursor berkedip setelah selesai
+                    typingElement.appendChild(cursor);
+                    // Hilangkan cursor setelah 3 detik
+                    setTimeout(() => {
+                        if (cursor.parentNode) {
+                            cursor.remove();
+                        }
+                    }, 3000);
+                }
+            }
+            
+            // Mulai animasi setelah delay
+            setTimeout(typeWriter, 500);
+        }
+    });
+
+
+
+     class LiveChat {
+            constructor() {
+                this.chatButton = document.getElementById('chatButton');
+                this.chatWindow = document.getElementById('chatWindow');
+                this.closeBtn = document.getElementById('closeBtn');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.notificationBadge = document.getElementById('notificationBadge');
+                
+                this.isOpen = false;
+                this.messageCount = 0;
+                this.adminResponses = [
+                    "Terima kasih atas pertanyaan Anda. Saya akan membantu Anda dengan senang hati.",
+                    "Baik, saya sudah mencatat pertanyaan Anda. Mohon tunggu sebentar.",
+                    "Apakah ada hal lain yang ingin Anda tanyakan?",
+                    "Saya akan segera menghubungi tim yang tepat untuk membantu Anda.",
+                    "Terima kasih sudah menghubungi kami. Kami akan segera merespons.",
+                    "Pertanyaan yang bagus! Mari saya bantu Anda menyelesaikan masalah ini."
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                this.chatButton.addEventListener('click', () => this.toggleChat());
+                this.closeBtn.addEventListener('click', () => this.closeChat());
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+                
+                this.messageInput.addEventListener('input', () => {
+                    this.sendBtn.disabled = !this.messageInput.value.trim();
+                });
+                
+                // Simulate admin coming online
+                setTimeout(() => {
+                    this.showNotification();
+                }, 3000);
+            }
+            
+            toggleChat() {
+                if (this.isOpen) {
+                    this.closeChat();
+                } else {
+                    this.openChat();
+                }
+            }
+            
+            openChat() {
+                this.chatWindow.classList.add('active');
+                this.isOpen = true;
+                this.hideNotification();
+                this.messageInput.focus();
+            }
+            
+            closeChat() {
+                this.chatWindow.classList.remove('active');
+                this.isOpen = false;
+            }
+            
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                this.sendBtn.disabled = true;
+                
+                // Simulate admin typing
+                setTimeout(() => {
+                    this.showTyping();
+                }, 500);
+                
+                // Simulate admin response
+                setTimeout(() => {
+                    this.hideTyping();
+                    const response = this.adminResponses[Math.floor(Math.random() * this.adminResponses.length)];
+                    this.addMessage(response, 'admin');
+                }, 2000 + Math.random() * 2000);
+            }
+            
+            addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                const now = new Date();
+                const time = now.getHours().toString().padStart(2, '0') + ':' + 
+                           now.getMinutes().toString().padStart(2, '0');
+                
+                messageDiv.innerHTML = `
+                    ${content}
+                    <div class="message-time">${time}</div>
+                `;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                
+                this.messageCount++;
+            }
+            
+            showTyping() {
+                this.typingIndicator.style.display = 'block';
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+            
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+            
+            showNotification() {
+                if (!this.isOpen) {
+                    this.notificationBadge.style.display = 'flex';
+                }
+            }
+            
+            hideNotification() {
+                this.notificationBadge.style.display = 'none';
+            }
+        }
+        
+        // Initialize live chat
+        new LiveChat();
+  </script>
+
+
+</body>
+
+</html>

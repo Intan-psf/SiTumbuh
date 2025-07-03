@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Posyandu - Kader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"> {# Menggunakan admin.css #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> {# Untuk gaya umum jika ada #}
+</head>
+<body>
+    <button class="toggle-btn" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-heartbeat"></i> SiTumbuh</h3>
+            <p>Kader Posyandu</p>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('kader_dashboard') }}"><i class="fa fa-home icon"></i> <span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('kader_daftar_anak') }}"><i class="fa fa-child icon"></i> <span>Daftar Anak</span></a></li>
+            <li><a href="{{ url_for('admin_dafpos') }}"><i class="fa fa-list icon"></i> <span>Daftar Posyandu</span></a></li>
+            <li><a href="{{ url_for('admin_tambahpos') }}"><i class="fa fa-plus-circle icon"></i> <span>Tambah Posyandu</span></a></li>
+            <li><a href="{{ url_for('kader_logout') }}" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"><i class="fa fa-sign-out-alt icon"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content"> {# Pembungkus utama konten #}
+        <div class="top-header">
+            <div class="header-left">
+                <h4>Edit Posyandu</h4> {# Judul spesifik halaman ini #}
+                <small style="color: #64748b;">Perbarui detail kegiatan posyandu</small>
+            </div>
+            <div class="user-info">
+                <span>Selamat Datang, Kader {% if kader %}{{ kader.nama_lengkap }}{% else %}Pengguna{% endif %}</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="container dashboard-container"> {# Konten unik halaman #}
+            <div class="form-container-card">
+                <h2>Edit Kegiatan Posyandu: {{ kegiatan.nama_posyandu }}</h2>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="row">
+                            <div class="col-12">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                <form action="{{ url_for('edit_posyandu', id=kegiatan.id) }}" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="nama_posyandu">Nama Posyandu:</label>
+                        <input type="text" name="nama_posyandu" id="nama_posyandu" class="form-control" value="{{ kegiatan.nama_posyandu }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal_kegiatan">Tanggal Kegiatan:</label>
+                        <input type="date" name="tanggal_kegiatan" id="tanggal_kegiatan" class="form-control" value="{{ kegiatan.tanggal_kegiatan.strftime('%Y-%m-%d') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="waktu_mulai">Waktu Mulai:</label>
+                        <input type="time" name="waktu_mulai" id="waktu_mulai" class="form-control" value="{{ kegiatan.waktu_mulai.strftime('%H:%M') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="waktu_selesai">Waktu Selesai:</label>
+                        <input type="time" name="waktu_selesai" id="waktu_selesai" class="form-control" value="{{ kegiatan.waktu_selesai.strftime('%H:%M') }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tempat_kegiatan">Tempat Kegiatan:</label>
+                        <input type="text" name="tempat_kegiatan" id="tempat_kegiatan" class="form-control" value="{{ kegiatan.tempat_kegiatan }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="diskripsi">Deskripsi:</label>
+                        <textarea name="diskripsi" id="diskripsi" rows="4" class="form-control">{{ kegiatan.diskripsi }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto">Ganti Foto (opsional):</label>
+                        <input type="file" name="foto" id="foto" accept="image/*" class="form-control">
+                        {% if kegiatan.foto %}
+                        <small class="form-text text-muted current-foto-preview">Foto Saat Ini:</small>
+                        <img src="{{ url_for('static', filename='img/' ~ kegiatan.foto) }}" alt="Foto Posyandu" width="150" class="img-thumbnail">
+                        {% else %}
+                        <small class="form-text text-muted">Belum ada foto.</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">Simpan Perubahan</button>
+                        <a href="{{ url_for('admin_posyandu') }}" class="btn-cancel">Batal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/kader_sidebar_toggle.js') }}"></script>
+</body>
+</html>

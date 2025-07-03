@@ -1,0 +1,31 @@
+.chat-box {
+      max-width: 600px;
+      margin: 2rem auto;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+    #chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+    .message {
+      padding: 0.5rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 15px;
+      max-width: 70%;
+      clear: both;
+      word-wrap: break-word;
+    }
+    .doctor {
+      background-color: #d1e7dd;
+      float: left;
+    }
+    .user {
+      background-color: #cfe2ff;
+      float: right;
+    }

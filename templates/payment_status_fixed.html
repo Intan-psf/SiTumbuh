@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiTumbuh - Status Pembayaran</title>
+
+  <!-- font awesome cdn link -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <!-- bootstrapCSS CDN Link -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/doctor.css') }}">
+</head>
+
+<body>
+
+  <div id="Beranda"></div>
+  <!--header navbar section start -->
+  <header>
+    <!--logo name -->
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SiTumbuh" class="logo">    
+    
+    <!--navbar link-->
+    <nav class="navbar">
+      <ul>
+      <li><a href="{{ url_for('index') }}">Beranda</a></li>
+      <li><a href="#about">Tentang Kami</a></li>
+      <li><a href="{{ url_for('prediksi') }}">Prediksi</a></li>
+      <li><a href="{{ url_for('posyandu') }}">Posyandu</a></li>
+      <li><a href="{{ url_for('doctor') }}">Konsultasi Dokter</a></li>
+      <li><a href="{{ url_for('payment_history') }}">Riwayat Pembayaran</a></li>
+      <li><a href="#Contact">Kontak Kami</a></li>
+      <li><a href="{{ url_for('login') }}">Masuk</a></li>
+      </ul>
+    </nav>
+
+    <div class="fas fa-bars"></div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Status Pembayaran</h1>
+      <p>Cek status pembayaran appointment Anda</p>
+    </div>
+
+    <div class="payment-status-container">
+      <div class="status-card">
+        <div id="paymentStatus" class="loading">
+          <div class="status-icon">
+            <i class="fas fa-spinner fa-spin" id="statusIcon"></i>
+          </div>
+          <h2 id="statusText">Mengecek Status Pembayaran...</h2>
+          <p id="statusDetails">Mohon tunggu sebentar</p>
+        </div>
+        
+        <div class="payment-details">
+          <div class="detail-row">
+            <span class="label">Order ID:</span>
+            <span class="value" id="orderId">Loading...</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Dokter:</span>
+            <span class="value" id="doctorName">
+              {% if payment %}
+                {{ payment.doctor_name }}
+              {% else %}
+                Loading...
+              {% endif %}
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Metode Pembayaran:</span>
+            <span class="value" id="paymentMethod">Loading...</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Total:</span>
+            <span class="value" id="amount">Loading...</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Tanggal Appointment:</span>
+            <span class="value" id="appointmentDate">
+              {% if payment and payment.appointment_date %}
+                {{ payment.appointment_date }}
+              {% else %}
+                Loading...
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <a href="{{ url_for('doctor') }}" class="btn secondary">Kembali ke Dokter</a>
+          <a href="{{ url_for('payment_history') }}" class="btn primary">Lihat Semua Pembayaran</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get query parameters
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order_id');
+    const status = params.get('transaction_status');
+    
+    // Display order ID
+    if (orderId) {
+        document.getElementById('orderId').textContent = orderId;
+    }
+    
+    // Status elements
+    const paymentStatusElement = document.getElementById('paymentStatus');
+    const statusIconElement = document.getElementById('statusIcon');
+    const statusTextElement = document.getElementById('statusText');
+    const statusDetailsElement = document.getElementById('statusDetails');
+    
+    // Check payment status
+    if (orderId) {
+        fetch('/check_payment_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ order_id: orderId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            updatePaymentStatus(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            updatePaymentStatus({
+                success: false,
+                transaction_status: status || 'error',
+                payment_type: 'Unknown',
+                gross_amount: 'N/A'
+            });
+        });
+    } else {
+        updatePaymentStatus({
+            success: false,
+            transaction_status: 'error',
+            payment_type: 'N/A',
+            gross_amount: 'N/A'
+        });
+    }
+    
+    // Update payment status UI
+    function updatePaymentStatus(data) {
+        console.log('Payment data:', data);
+        
+        // Update payment details
+        document.getElementById('paymentMethod').textContent = formatPaymentMethod(data.payment_type);
+        document.getElementById('amount').textContent = formatCurrency(data.gross_amount);
+        
+        // Update doctor name if available
+        if (data.doctor && data.doctor.name) {
+            document.getElementById('doctorName').textContent = data.doctor.name;
+        }
+        
+        // Update appointment date if available
+        if (data.appointment_date) {
+            document.getElementById('appointmentDate').textContent = formatDate(data.appointment_date);
+        }
+        
+        // Remove loading class
+        paymentStatusElement.classList.remove('loading');
+        
+        // Update status UI based on transaction status
+        switch (data.transaction_status) {
+            case 'settlement':
+            case 'capture':
+            case 'success': // Added for compatibility
+                paymentStatusElement.classList.add('success');
+                statusIconElement.className = 'fas fa-check-circle';
+                statusTextElement.textContent = 'Pembayaran Berhasil';
+                statusDetailsElement.textContent = 'Appointment Anda telah dikonfirmasi. Terima kasih atas pembayarannya!';
+                break;
+                
+            case 'pending':
+                paymentStatusElement.classList.add('pending');
+                statusIconElement.className = 'fas fa-clock';
+                statusTextElement.textContent = 'Menunggu Pembayaran';
+                statusDetailsElement.textContent = 'Silakan selesaikan pembayaran Anda untuk mengkonfirmasi appointment.';
+                break;
+                
+            case 'deny':
+            case 'cancel':
+            case 'expire':
+            case 'failed': // Added for compatibility
+                paymentStatusElement.classList.add('failed');
+                statusIconElement.className = 'fas fa-times-circle';
+                statusTextElement.textContent = 'Pembayaran Gagal';
+                statusDetailsElement.textContent = 'Pembayaran Anda tidak dapat diproses. Silakan coba lagi atau hubungi dukungan kami.';
+                break;
+                
+            default:
+                paymentStatusElement.classList.add('unknown');
+                statusIconElement.className = 'fas fa-question-circle';
+                statusTextElement.textContent = 'Status Tidak Diketahui';
+                statusDetailsElement.textContent = 'Kami tidak dapat menentukan status pembayaran Anda. Silakan hubungi dukungan kami.';
+        }
+    }
+    
+    function formatPaymentMethod(method) {
+        if (!method || method === 'Unknown') return 'Belum Diproses';
+        
+        const methods = {
+            'credit_card': 'Kartu Kredit',
+            'cimb_clicks': 'CIMB Clicks',
+            'bca_klikpay': 'BCA KlikPay',
+            'bca_klikbca': 'KlikBCA',
+            'bri_epay': 'BRI e-Pay',
+            'echannel': 'Mandiri Bill',
+            'permata_va': 'Permata Virtual Account',
+            'bca_va': 'BCA Virtual Account',
+            'bni_va': 'BNI Virtual Account',
+            'bri_va': 'BRI Virtual Account',
+            'other_va': 'Virtual Account',
+            'gopay': 'GoPay',
+            'shopeepay': 'ShopeePay',
+            'indomaret': 'Indomaret',
+            'alfamart': 'Alfamart',
+            'danamon_online': 'Danamon Online',
+            'akulaku': 'Akulaku'
+        };
+        
+        return methods[method.toLowerCase()] || method;
+    }
+    
+    function formatCurrency(amount) {
+        if (!amount || amount === 'N/A') return 'N/A';
+        return 'Rp ' + Number(amount).toLocaleString('id-ID');
+    }
+    
+    function formatDateTime(datetime) {
+        if (!datetime || datetime === 'N/A') return 'N/A';
+        
+        const date = new Date(datetime);
+        if (isNaN(date)) return datetime;
+        
+        return date.toLocaleString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        
+        const date = new Date(dateString);
+        if (isNaN(date)) return dateString;
+        
+        return date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+});
+</script>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='navbar.js') }}"></script>
+
+</body>
+</html>

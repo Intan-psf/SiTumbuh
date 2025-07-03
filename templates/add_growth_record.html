@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Catatan Pertumbuhan untuk {{ child.nama }} - SiTumbuh</title>
+    <style>
+
+        /* Reset dan Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Header Styles */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Navbar Styles */
+.navbar ul {
+    align-items: center;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar a:hover {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.navbar a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.navbar a:hover::before {
+    left: 100%;
+}
+
+/* Mobile Menu Toggle */
+.fas.fa-bars {
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+    display: none;
+}
+
+/* Container Styles */
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.form-growth-record-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.form-growth-record-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* Typography */
+h1 {
+    color: #333;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.form-growth-record-container > p {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.form-growth-record-container > p strong {
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    border: none;
+    font-weight: 500;
+    animation: slideInDown 0.5s ease;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.alert-danger {
+    background: linear-gradient(45deg, #dc3545, #e83e8c);
+    color: white;
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+.alert-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+    color: #333;
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* Form Styles */
+form {
+    space-y: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-label small {
+    color: #999;
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #fff;
+    position: relative;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-control:hover {
+    border-color: #667eea;
+}
+
+/* Input Animation */
+.form-group {
+    position: relative;
+}
+
+.form-control:focus + .form-label,
+.form-control:not(:placeholder-shown) + .form-label {
+    transform: translateY(-25px) scale(0.8);
+    color: #667eea;
+}
+
+/* Textarea Specific */
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Button Styles */
+.btn-submit-record {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn-submit-record:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+}
+
+.btn-submit-record:active {
+    transform: translateY(-1px);
+}
+
+.btn-submit-record::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-submit-record:hover::before {
+    left: 100%;
+}
+
+/* Animations */
+@keyframes slideInDown {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.form-growth-record-container {
+    animation: fadeInUp 0.6s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .fas.fa-bars {
+        display: block;
+    }
+    
+    .navbar ul {
+        display: none !important;
+    }
+    
+    .container {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .form-growth-record-container {
+        padding: 1.5rem;
+        margin: 1rem;
+        border-radius: 15px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 0.75rem;
+    }
+    
+    .btn-submit-record {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-growth-record-container {
+        padding: 1rem;
+        margin: 0.5rem;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+    }
+    
+    .form-control {
+        padding: 0.625rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Loading State */
+.btn-submit-record:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-submit-record:disabled:hover {
+    transform: none;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Focus Indicators untuk Accessibility */
+.form-control:focus,
+.btn-submit-record:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+    }
+    
+    header,
+    .btn-submit-record {
+        display: none;
+    }
+    
+    .form-growth-record-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+    </style>
+
+
+
+
+    </head>
+<body>
+
+
+    <div class="container form-growth-record-container">
+        <h1>Tambah Catatan Pertumbuhan</h1>
+        <p>untuk <strong>{{ child.nama }}</strong></p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {# Form ini harus POST ke rute yang sama #}
+        <form method="POST" action="{{ url_for('tambah_catatan_pertumbuhan', id_anak=child.id) }}">
+            <div class="mb-3 form-group">
+                <label for="tanggal_pengukuran" class="form-label">Tanggal Pengukuran</label>
+                <input type="date" class="form-control" id="tanggal_pengukuran" name="tanggal_pengukuran" value="{{ datetime.utcnow().strftime('%Y-%m-%d') }}" required>
+            </div>
+            <div class="mb-3 form-group">
+                <label for="berat_kg" class="form-label">Berat Badan (kg)</label>
+                <input type="number" step="0.1" class="form-control" id="berat_kg" name="berat_kg" required>
+            </div>
+            <div class="mb-3 form-group">
+                <label for="tinggi_cm" class="form-label">Tinggi Badan (cm)</label>
+                <input type="number" step="0.1" class="form-control" id="tinggi_cm" name="tinggi_cm" required>
+            </div>
+            <div class="mb-3 form-group">
+                <label for="lingkar_kepala_cm" class="form-label">Lingkar Kepala (cm) <small>(Opsional)</small></label>
+                <input type="number" step="0.1" class="form-control" id="lingkar_kepala_cm" name="lingkar_kepala_cm">
+            </div>
+            <div class="mb-3 form-group">
+                <label for="lila_cm" class="form-label">Lingkar Lengan Atas (cm) <small>(Opsional)</small></label>
+                <input type="number" step="0.1" class="form-control" id="lila_cm" name="lila_cm">
+            </div>
+            <div class="mb-3 form-group">
+                <label for="keterangan" class="form-label">Keterangan <small>(Opsional)</small></label>
+                <textarea class="form-control" id="keterangan" name="keterangan" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-submit-record">Simpan Catatan</button>
+        </form>
+    </div>
+
+    </body>
+</html>

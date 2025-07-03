@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SiTumbuh - Chat Dokter</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/doctor.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/payment.css') }}" />
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0f2fe 0%, #f8fbff 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .chat-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 20px 20px 0 0;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.2);
+    }
+
+    .chat-header h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .doctor-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      background: #4caf50;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .chat-box {
+      background: white;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 10px 30px rgba(25, 118, 210, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    #chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: #fafbfc;
+    }
+
+    #chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    .message {
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      border-radius: 18px;
+      max-width: 75%;
+      clear: both;
+      word-wrap: break-word;
+      position: relative;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Style untuk pesan yang dikirim oleh dokter (saya) */
+    .my-message {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      color: white;
+      float: right;
+      margin-left: auto;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    }
+
+    .my-message::before {
+      content: '';
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 8px solid #1976d2;
+    }
+
+    /* Style untuk pesan yang diterima dari pasien */
+    .received-message {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      color: #1565c0;
+      border: 1px solid #90caf9;
+      float: left;
+      margin-right: auto;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+    }
+
+    .received-message::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 8px solid #e3f2fd;
+    }
+
+    .message small {
+      display: block;
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+      font-weight: 300;
+    }
+
+    .chat-input-container {
+      padding: 1.5rem;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .form-control {
+      flex: 1;
+      border: 2px solid #e5e7eb;
+      border-radius: 25px;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #f9fafb;
+    }
+
+    .form-control:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+      background: white;
+    }
+
+    .btn-send {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    }
+
+    .btn-send:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(25, 118, 210, 0.4);
+    }
+
+    .btn-send:active {
+      transform: scale(0.95);
+    }
+
+    .back-button {
+      background: linear-gradient(135deg, #78909c 0%, #607d8b 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.5rem;
+      margin-top: 1rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(120, 144, 156, 0.3);
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(120, 144, 156, 0.4);
+      color: white;
+      text-decoration: none;
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 1rem 1.25rem;
+      background: #e5e7eb;
+      border-radius: 18px;
+      margin-bottom: 1rem;
+      max-width: 75%;
+      float: left;
+      clear: both;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #9ca3af;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.4;
+      }
+      30% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .chat-container {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+      }
+
+      .chat-box {
+        height: calc(100vh - 200px);
+      }
+
+      .message {
+        max-width: 85%;
+      }
+
+      .chat-header {
+        padding: 1rem;
+      }
+
+      .chat-header h3 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SiTumbuh" class="logo" />
+    <!-- {% include '_clean_navbar.html' %} -->
+    <div class="fas fa-bars"></div>
+  </header>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <h3>
+        <i class="fas fa-comments"></i> 
+        Chat dengan Pasien ({{ patient_name }})
+      </h3>
+      <div class="doctor-status">
+        <div class="status-indicator"></div>
+        <span>Online</span>
+      </div>
+    </div>
+
+    <div class="chat-box">
+      <div id="chat-messages">
+        {# Messages will be loaded via JavaScript #}
+        <div class="typing-indicator" id="typing-indicator">
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-container">
+        <form id="chat-form" method="POST" action="{{ url_for('dokter_chat_room', pembayaran_id=pembayaran_id) }}">
+          <div class="input-group">
+            <input
+              type="text"
+              name="message"
+              id="message-input"
+              class="form-control"
+              placeholder="Ketik pesan Anda..."
+              autocomplete="off"
+              required
+            />
+            <button class="btn-send" type="submit">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <a href="{{ url_for('dokter_chat_list') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i>
+      Kembali ke Daftar Chat Pasien
+    </a>
+  </div>
+
+  <script>
+    // Ensure initialMessages is defined from Flask context
+    const initialMessages = {{ messages | tojson }}; 
+    const pembayaranId = {{ pembayaran_id | tojson }}; // Menggunakan tojson untuk memastikan tipe data
+
+    const chatMessages = document.getElementById('chat-messages');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const form = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+
+    function scrollToBottom() {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function loadInitialMessages() {
+        let childrenToRemove = [];
+        for(let i = chatMessages.children.length - 1; i >= 0; i--) {
+            if (chatMessages.children[i].id !== 'typing-indicator') {
+                childrenToRemove.push(chatMessages.children[i]);
+            }
+        }
+        childrenToRemove.forEach(child => chatMessages.removeChild(child));
+
+        initialMessages.forEach(msg => {
+            const div = document.createElement('div');
+            // In dokter_chat_room, the current user is always the doctor.
+            const isMyMessage = (msg[0] === 'doctor'); 
+
+            div.className = 'message ' + (isMyMessage ? 'my-message' : 'received-message');
+            div.innerHTML = `${msg[1]}<small>${msg[2]}</small>`; 
+            chatMessages.insertBefore(div, typingIndicator); 
+        });
+        scrollToBottom();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadInitialMessages);
+
+    form.addEventListener('submit', (e) => {
+      const message = messageInput.value.trim();
+      if (!message) {
+        e.preventDefault();
+        return;
+      }
+      typingIndicator.style.display = 'block';
+      scrollToBottom();
+    });
+
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        form.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    messageInput.focus();
+
+    const observer = new MutationObserver(() => {
+      scrollToBottom();
+    });
+    observer.observe(chatMessages, {
+      childList: true,
+      subtree: true
+    });
+
+    async function fetchMessages() {
+      const response = await fetch(`/chat_api/${pembayaranId}`);
+
+      const data = await response.json();
+
+      const container = document.getElementById("chat-messages");
+      let childrenToRemove = [];
+      for(let i = container.children.length - 1; i >= 0; i--) {
+        if (container.children[i].id !== 'typing-indicator') {
+          childrenToRemove.push(container.children[i]);
+        }
+      }
+      childrenToRemove.forEach(child => container.removeChild(child));
+      
+      data.forEach(msg => {
+        const div = document.createElement('div');
+        const isMyMessage = (msg.pengirim === 'doctor'); 
+
+        div.className = 'message ' + (isMyMessage ? 'my-message' : 'received-message');
+        div.innerHTML = `${msg.pesan}<small>${msg.waktu}</small>`;
+        container.insertBefore(div, typingIndicator); 
+      });
+
+      typingIndicator.style.display = 'none';
+      scrollToBottom();
+    }
+
+    setInterval(fetchMessages, 3000); 
+  </script>
+</body>
+</html>

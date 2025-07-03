@@ -1,0 +1,27 @@
+<!-- Medical Services Contextual Navigation -->
+<div class="medical-services-nav">
+  <div class="container">
+    <div class="services-nav-header">
+      <h2>Layanan Medis</h2>
+      <p>Konsultasi Dokter dan Riwayat Pembayaran</p>
+    </div>
+    <div class="services-nav-links">
+      <a href="{{ url_for('doctor') }}" class="service-link {% if request.endpoint == 'doctor' %}active{% endif %}">
+        <i class="fas fa-user-md"></i>
+        <span>Konsultasi Dokter</span>
+        <small>Booking dan konsultasi dengan dokter profesional</small>
+      </a>
+      <a href="{{ url_for('payment_history') }}" class="service-link {% if request.endpoint == 'payment_history' %}active{% endif %}">
+        <i class="fas fa-history"></i>
+        <span>Riwayat Pembayaran</span>
+        <small>Lihat riwayat pembayaran konsultasi Anda</small>
+      </a>
+      <div class="services-nav-links">
+      <a href="{{ url_for('chat_dokter') }}" class="service-link {% if request.endpoint == 'chat_dokter' %}active{% endif %}">
+        <i class="fas fa-user-md"></i>
+        <span>Chat Dokter</span>
+        <small>Konsultasikan masalah stunting anak pada sang ahli</small>
+      </a>
+    </div>
+  </div>
+</div>

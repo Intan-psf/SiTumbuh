@@ -1,0 +1,24 @@
+ <header class="d-flex justify-content-between align-items-center p-3">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SiTumbuh" class="logo" />
+    <div class="floating-shapes">
+        <div class="shape" style="width: 80px; height: 80px; background: linear-gradient(45deg, var(--blue), #00a8ff); border-radius: 50%;"></div>
+        <div class="shape" style="width: 60px; height: 60px; background: linear-gradient(45deg, #00a8ff, var(--blue)); border-radius: 20px;"></div>
+        <div class="shape" style="width: 100px; height: 100px; background: linear-gradient(45deg, var(--blue), #00a8ff); clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+    </div>
+<nav class="navbar">
+  <ul class="d-flex list-unstyled gap-3 m-0">
+    <li><a href="{{ url_for('index') }}">Beranda</a></li>
+    <li><a href="{{ url_for('index') }}#about">Tentang Kami</a></li>
+    <li><a href="{{ url_for('prediksi') }}">Prediksi</a></li>
+    <li><a href="{{ url_for('posyandu') }}">Posyandu</a></li>
+    <li><a href="{{ url_for('kontakkami') }}">Kontak Kami</a></li>
+    <li><a href="{{ url_for('login') }}">Masuk</a></li>
+    {% if user %}
+        <li><a href="{{ url_for('profile_dashboard') }}">Profil</a></li> {# Ubah dari 'profile' menjadi 'profile_dashboard' #}
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+    <div class="fas fa-bars"></div>
+  </header>

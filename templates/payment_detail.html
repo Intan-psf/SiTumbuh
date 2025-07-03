@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiTumbuh - Detail Pembayaran</title>
+
+  <!-- font awesome cdn link -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <!-- bootstrapCSS CDN Link -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/doctor.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/payment.css') }}">
+</head>
+
+<body>
+
+  <div id="Beranda"></div>
+  <!--header navbar section start -->
+  <header>
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="SiTumbuh" class="logo" />
+    {% include '_clean_navbar.html' %}
+    <div class="fas fa-bars"></div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Detail Pembayaran</h1>
+      <p>Informasi detail pembayaran Anda</p>
+    </div>
+
+    <div class="payment-detail-container">
+      <div class="detail-card">
+        {% if payment %}
+        <div class="payment-header">
+          <h2>Order ID: {{ payment.order_id }}</h2>
+          <span class="status-badge {{ payment.transaction_status }}">
+            {{ payment.transaction_status|title }}
+          </span>
+        </div>
+        
+        <div class="payment-info">
+          <div class="info-section">
+            <h3>Informasi Dokter</h3>
+            <p><strong>Nama:</strong> {{ payment.doctor_name }}</p>
+          </div>
+          
+          <div class="info-section">
+            <h3>Informasi Appointment</h3>
+            <p><strong>Tanggal:</strong> {{ payment.appointment_date }}</p>
+            <p><strong>Waktu:</strong> {{ payment.appointment_time }}</p>
+          </div>
+          
+          <div class="info-section">
+            <h3>Informasi Pembayaran</h3>
+            <p><strong>Jumlah:</strong> Rp {{ payment.gross_amount|format_number }}</p>
+            <p><strong>Metode:</strong> {{ payment.payment_type or 'Belum dikonfirmasi' }}</p>
+            <p><strong>Status:</strong> {{ payment.transaction_status|title }}</p>
+            <p><strong>Waktu Transaksi:</strong> {{ payment.transaction_time or 'Belum dikonfirmasi' }}</p>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          <a href="{{ url_for('payment_history') }}" class="btn secondary">Kembali</a>
+          {% if payment.transaction_status == 'pending' and payment.snap_token %}
+          <button class="btn primary pay-btn" data-snap-token="{{ payment.snap_token }}">
+            Lanjutkan Pembayaran
+          </button>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="not-found">
+          <i class="fas fa-exclamation-circle"></i>
+          <h3>Pembayaran Tidak Ditemukan</h3>
+          <p>Detail pembayaran yang Anda cari tidak ditemukan.</p>
+          <a href="{{ url_for('payment_history') }}" class="btn primary">Kembali ke Riwayat Pembayaran</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+
+  <!-- Midtrans JS SDK -->
+  <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ midtrans_client_key }}"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const payBtn = document.querySelector('.pay-btn');
+    
+    if (payBtn) {
+      payBtn.addEventListener('click', function() {
+        const snapToken = this.getAttribute('data-snap-token');
+        
+        if (snapToken && typeof snap !== 'undefined') {
+          snap.pay(snapToken, {
+            onSuccess: function(result) {
+              window.location.href = `/payment_status?order_id=${result.order_id}&transaction_status=settlement`;
+            },
+            onPending: function(result) {
+              window.location.href = `/payment_status?order_id=${result.order_id}&transaction_status=pending`;
+            },
+            onError: function(result) {
+              window.location.href = `/payment_status?order_id=${result.order_id}&transaction_status=deny`;
+            }
+          });
+        } else {
+          alert('Error: Could not initialize payment. Please try again.');
+        }
+      });
+    }
+  });
+  </script>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='navbar.js') }}"></script>
+</body>
+</html>

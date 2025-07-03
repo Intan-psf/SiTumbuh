@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Pendaftaran Posyandu - Kader</title> {# Judul yang lebih spesifik #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kader-dashboard.css') }}">
+</head>
+<body>
+    <button class="toggle-btn" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-heartbeat"></i> SiTumbuh</h3>
+            <p>Kader Posyandu</p>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('kader_dashboard') }}"><i class="fa fa-home icon"></i> <span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('kader_daftar_anak') }}"><i class="fa fa-child icon"></i> <span>Daftar Anak</span></a></li>
+            <li><a href="{{ url_for('admin_dafpos') }}"><i class="fa fa-list icon"></i> <span>Daftar Posyandu</span></a></li>
+            <li><a href="{{ url_for('admin_tambahpos') }}"><i class="fa fa-plus-circle icon"></i> <span>Tambah Posyandu</span></a></li>
+            <li><a href="{{ url_for('kader_logout') }}" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"><i class="fa fa-sign-out-alt icon"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <h4>Data Pendaftaran Posyandu</h4> {# HANYA SATU JUDUL #}
+                <small style="color: #64748b;">Kelola data pendaftaran kegiatan</small> {# Pesan lebih relevan #}
+            </div>
+            <div class="user-info">
+                <span>Selamat Datang, Kader {% if kader %}{{ kader.nama_lengkap }}{% else %}Pengguna{% endif %}</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="container dashboard-container"> {# Memulai konten utama #}
+            {# <hr> #} {# Hapus ini jika tidak diperlukan, karena top-header sudah ada #}
+            
+            <h2 class="text-center mb-4">Daftar Pendaftaran Kegiatan</h2> {# Judul konten #}
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="row">
+                        <div class="col-12">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% if daftar_pendaftaran %}
+                <div class="table-responsive"> {# Bungkus tabel dengan div responsive #}
+                    <table class="table table-striped table-hover"> {# Gunakan kelas Bootstrap untuk tabel #}
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Orang Tua</th>
+                                <th>Nama Anak</th>
+                                <th>Umur Anak</th>
+                                <th>NIK</th>
+                                <th>Alamat</th>
+                                <th>No. HP</th>
+                                <th>Nama Kegiatan</th>
+                                <th>Tanggal Daftar</th>
+                                <th>Status WA</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for pendaftaran in daftar_pendaftaran %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ pendaftaran.nama_ortu }}</td>
+                                <td>{{ pendaftaran.nama_anak }}</td>
+                                <td>{{ pendaftaran.umur_anak }}</td>
+                                <td>{{ pendaftaran.nik }}</td>
+                                <td>{{ pendaftaran.alamat }}</td>
+                                <td>{{ pendaftaran.no_hp }}</td>
+                                <td>{{ pendaftaran.kegiatan.nama_posyandu }}</td>
+                                <td>{{ pendaftaran.tanggal_daftar.strftime('%d-%m-%Y %H:%M') }}</td>
+                                <td>
+                                    {% if pendaftaran.wa_terkirim %}
+                                        <span class="badge bg-success">Terkirim</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Belum Terkirim</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('kirim_wa', pendaftaran_id=pendaftaran.id) }}" class="btn btn-sm btn-primary">Kirim WA</a> {# Gunakan btn-primary #}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-center mt-4">Tidak ada data pendaftaran posyandu.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    {# SCRIPT JavaScript yang sudah diperbaiki #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/kader_sidebar_toggle.js') }}"></script>
+</body>
+</html>

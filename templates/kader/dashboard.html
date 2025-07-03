@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Link ke file CSS yang sudah dioptimasi -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/kader-dashboard.css') }}">
+</head>
+<body>
+    <button class="toggle-btn" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-heartbeat"></i> SiTumbuh</h3>
+            <p>Kader Posyandu</p>
+        </div>
+        <ul>
+            <li><a href="{{ url_for('kader_dashboard') }}"><i class="fa fa-home icon"></i> <span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('kader_daftar_anak') }}"><i class="fa fa-child icon"></i> <span>Daftar Anak</span></a></li>
+            <li><a href="{{ url_for('admin_dafpos') }}"><i class="fa fa-list icon"></i> <span>Daftar Posyandu</span></a></li>
+            <li><a href="{{ url_for('admin_tambahpos') }}"><i class="fa fa-plus-circle icon"></i> <span>Tambah Posyandu</span></a></li>
+            <li><a href="{{ url_for('kader_logout') }}" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"><i class="fa fa-sign-out-alt icon"></i> <span>Logout</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="top-header">
+            <div class="header-left">
+                <h4>Dashboard Kader</h4>
+                <small style="color: #64748b;">Kelola data posyandu dengan mudah</small>
+            </div>
+            <div class="user-info">
+                <span>Selamat Datang, Kader {{ kader.nama_lengkap }}</span>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="container dashboard-container">
+            <h1><i class="fas fa-tachometer-alt" style="margin-right: 15px; color: #667eea;"></i>Dashboard Kader</h1>
+
+            <div class="row dashboard-stats">
+                <div class="col-md-4">
+                    <div class="card bg-info text-white floating">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-3x mb-3"></i>
+                            <h3>{{ user_aktif }}</h3>
+                            <p>Total Pengguna Terdaftar</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-success text-white floating" style="animation-delay: 0.2s;">
+                        <div class="card-body">
+                            <i class="fas fa-hospital-user fa-3x mb-3"></i>
+                            <h3>{{ jumlah_pendaftaran }}</h3>
+                            <p>Pendaftaran Posyandu</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-white floating" style="animation-delay: 0.4s;">
+                        <div class="card-body">
+                            <i class="fas fa-calendar-check fa-3x mb-3"></i>
+                            <h3>{{ jumlah_kegiatan }}</h3>
+                            <p>Kegiatan Posyandu Dibuat</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-5">
+
+            <div class="chart-container">
+                <h2><i class="fas fa-chart-line" style="margin-right: 10px; color: #667eea;"></i>Statistik Kegiatan</h2>
+                <div id="chartLoading" class="chart-loading">
+                    <i class="fas fa-spinner loading-spinner"></i>
+                    <span>Memuat grafik...</span>
+                </div>
+                <canvas id="kaderActivityChart" style="display: none;"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+// JavaScript yang sudah diperbaiki
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.querySelector('.toggle-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content'); // Ganti dari .content ke .main-content
+
+    console.log('Toggle button:', toggleBtn); // Debug
+    console.log('Sidebar:', sidebar); // Debug
+    console.log('Main content:', mainContent); // Debug
+
+    if (toggleBtn && sidebar && mainContent) {
+        toggleBtn.addEventListener('click', function() {
+            console.log('Toggle button clicked!'); // Debug
+            
+            // Toggle classes
+            sidebar.classList.toggle('closed');
+            mainContent.classList.toggle('fullwidth');
+            
+            // Update icon
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('closed')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-indent');
+            } else {
+                icon.classList.remove('fa-indent');
+                icon.classList.add('fa-bars');
+            }
+        });
+    } else {
+        console.error('Elemen tidak ditemukan:', {
+            toggleBtn: !!toggleBtn,
+            sidebar: !!sidebar,
+            mainContent: !!mainContent
+        });
+    }
+});
+        // // Inisialisasi Chart dengan data dari database (MEMPERTAHANKAN STRUKTUR ASLI)
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     // Sembunyikan loading setelah 1 detik
+        //     setTimeout(() => {
+        //         document.getElementById('chartLoading').style.display = 'none';
+        //         document.getElementById('kaderActivityChart').style.display = 'block';
+                
+        //         // Inisialisasi chart
+        //         var ctx = document.getElementById('kaderActivityChart');
+        //         if (ctx) {
+        //             var kaderActivityChart = new Chart(ctx.getContext('2d'), {
+        //                 type: 'bar',
+        //                 data: {
+        //                     labels: {{ bulan_list | tojson }},
+        //                     datasets: [{
+        //                         label: 'Jumlah Kegiatan',
+        //                         data: {{ data_kegiatan | tojson }},
+        //                         backgroundColor: [
+        //                             'rgba(102, 126, 234, 0.8)',
+        //                             'rgba(16, 185, 129, 0.8)',
+        //                             'rgba(245, 158, 11, 0.8)',
+        //                             'rgba(239, 68, 68, 0.8)',
+        //                             'rgba(139, 92, 246, 0.8)',
+        //                             'rgba(6, 182, 212, 0.8)'
+        //                         ],
+        //                         borderColor: [
+        //                             'rgba(102, 126, 234, 1)',
+        //                             'rgba(16, 185, 129, 1)',
+        //                             'rgba(245, 158, 11, 1)',
+        //                             'rgba(239, 68, 68, 1)',
+        //                             'rgba(139, 92, 246, 1)',
+        //                             'rgba(6, 182, 212, 1)'
+        //                         ],
+        //                         borderWidth: 2,
+        //                         borderRadius: 8
+        //                     }]
+        //                 },
+        //                 options: {
+        //                     responsive: true,
+        //                     maintainAspectRatio: false,
+        //                     plugins: {
+        //                         title: {
+        //                             display: true,
+        //                             text: 'Kegiatan Posyandu per Bulan',
+        //                             font: {
+        //                                 size: 16,
+        //                                 weight: 'bold'
+        //                             }
+        //                         },
+        //                         legend: {
+        //                             display: false
+        //                         }
+        //                     },
+        //                     scales: {
+        //                         y: {
+        //                             beginAtZero: true,
+        //                             grid: {
+        //                                 color: 'rgba(0,0,0,0.05)'
+        //                             }
+        //                         },
+        //                         x: {
+        //                             grid: {
+        //                                 display: false
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             });
+        //         } else {
+        //             console.error("Canvas element with ID 'kaderActivityChart' not found.");
+        //         }
+        //     }, 1000);
+        // });
+    </script>
+</body>
+</html>

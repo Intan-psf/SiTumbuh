@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Kader Approval</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== ADMIN.CSS ===== */
+
+    /* --- GENERAL RESET & BASE STYLES --- */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f4f7f6 0%, #e2e8f0 100%);
+        min-height: 100vh;
+        display: flex;
+        color: #333;
+    }
+
+    /* --- SIDEBAR & TOGGLE BUTTON --- */
+    .toggle-btn {
+        position: fixed !important;
+        top: 20px !important;
+        left: 20px !important;
+        z-index: 9999 !important;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed 100%) !important;
+        color: white !important;
+        border: none !important;
+        width: 50px !important;
+        height: 50px !important;
+        border-radius: 50% !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 18px !important;
+        box-shadow: 0 4px 15px rgba(94, 41, 122, 0.3) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .toggle-btn:hover {
+        background: linear-gradient(135deg, #4f46e5, #462185 100%) !important;
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 20px rgba(94, 41, 122, 0.3) !important;
+    }
+
+    .toggle-btn:active {
+        transform: scale(0.95) !important;
+    }
+
+    .toggle-btn i {
+        color: white !important;
+        font-size: 18px !important;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%);
+        padding: 80px 0 20px;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        overflow-y: auto;
+    }
+
+    .sidebar.closed {
+        left: -280px;
+    }
+
+    .sidebar-header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        padding: 0 20px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .sidebar-header h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-header p {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar li {
+        margin: 5px 0;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 15px 25px;
+        color: rgba(255,255,255,0.9);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-radius: 0 25px 25px 0;
+        margin-right: 20px;
+    }
+
+    .sidebar a:hover {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .sidebar a.active {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    .sidebar .icon {
+        width: 20px;
+        margin-right: 15px;
+        font-size: 18px;
+    }
+
+    /* --- MAIN CONTENT & TOP HEADER --- */
+    .main-content {
+        margin-left: 280px;
+        padding: 20px;
+        flex-grow: 1;
+        transition: margin-left 0.3s ease;
+        min-height: 100vh;
+        padding-top: 100px;
+        position: relative;
+    }
+
+    .main-content.fullwidth {
+        margin-left: 0;
+    }
+
+    .top-header {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px 30px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        width: auto;
+        z-index: 99;
+    }
+
+    .top-header.fullwidth-header {
+        left: 80px;
+        width: calc(100% - 100px);
+    }
+
+    .header-left h4 {
+        color: #334155;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .header-left small {
+        color: #000000;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-info span {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .user-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    /* --- CONTENT CONTAINER --- */
+    .container.dashboard-container {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 25px;
+        padding: 40px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        margin-top: 0;
+    }
+
+    .dashboard-container h1, .dashboard-container h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 2.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-container h2 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+    }
+
+    /* --- FLASH MESSAGES --- */
+    .flash-messages {
+        margin-bottom: 30px;
+    }
+
+    .flash-messages ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .flash-messages li {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        animation: slideInDown 0.5s ease-out;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* --- TABLE STYLES --- */
+    .table-container {
+        background: rgba(255,255,255,0.7);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        color: white;
+    }
+
+    th, td {
+        padding: 15px 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    th {
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+        background: rgba(79, 70, 229, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    tbody tr:nth-child(even) {
+        background: rgba(248, 250, 252, 0.5);
+    }
+
+    /* --- BUTTON STYLES --- */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn-approve, .btn-reject {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-approve {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-approve:hover {
+        background: linear-gradient(135deg, #059669, #047857);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-reject {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-reject:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+
+    /* --- EMPTY STATE --- */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #64748b;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #cbd5e1;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: #475569;
+    }
+
+    .empty-state p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    /* --- RESPONSIVE DESIGN --- */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            transform: translateX(-100%);
+        }
+        
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar:not(.closed) {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+            padding: 15px;
+            padding-top: 80px;
+        }
+        
+        .toggle-btn {
+            top: 15px;
+            left: 15px;
+        }
+        
+        .top-header {
+            left: 0;
+            width: 100%;
+            border-radius: 0;
+            padding: 15px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 998;
+        }
+        
+        .top-header.fullwidth-header {
+            left: 0;
+            width: 100%;
+        }
+        
+        .top-header .user-info {
+            justify-content: flex-start;
+            width: 100%;
+        }
+        
+        .dashboard-container {
+            padding: 25px 20px;
+            border-radius: 15px;
+        }
+        
+        .dashboard-container h1, .dashboard-container h2 {
+            font-size: 1.8rem;
+        }
+        
+        .table-container {
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        table {
+            font-size: 0.8rem;
+        }
+        
+        th, td {
+            padding: 10px 8px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .btn-approve, .btn-reject {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+    }
+
+    /* Hover effects untuk mobile */
+    @media (hover: none) {
+        .sidebar a:hover {
+            background: none;
+            transform: none;
+        }
+        
+        tbody tr:hover {
+            background: none;
+            transform: none;
+            box-shadow: none;
+        }
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-btn" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>Admin Panel</h3>
+      <p>Sistem Manajemen</p>
+    </div>
+    <ul>
+      <li><a href="{{ url_for('admin_dashboard') }}"><i class="fa fa-home icon"></i> Dashboard</a></li>
+      <li><a href="{{ url_for('admin_kader_approval') }}" class="active"><i class="fa fa-check icon"></i> Approval Kader</a></li>
+      <li><a href="{{ url_for('admin_logout') }}"><i class="fa fa-sign-out-alt icon"></i> Logout</a></li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="top-header">
+      <div class="header-left">
+        <h4>Approval Kader</h4>
+        <small>Kelola persetujuan kader baru</small>
+      </div>
+      <div class="user-info">
+        <span>Administrator</span>
+        <div class="user-avatar">A</div>
+      </div>
+    </div>
+
+    <div class="container dashboard-container">
+      <h2>Approval Kader</h2>
+      
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            <ul>
+              {% for category, message in messages %}
+                {% if category == 'approval' %}
+                  <li><i class="fas fa-check-circle"></i> {{ message }}</li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if pending_kaders %}
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th><i class="fas fa-user"></i> Username</th>
+                <th><i class="fas fa-id-card"></i> Nama Lengkap</th>
+                <th><i class="fas fa-envelope"></i> Email</th>
+                <th><i class="fas fa-phone"></i> No Telepon</th>
+                <th><i class="fas fa-map-marker-alt"></i> Alamat</th>
+                <th><i class="fas fa-hospital"></i> Wilayah Posyandu</th>
+                <th><i class="fas fa-cogs"></i> Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for kader in pending_kaders %}
+              <tr>
+                <td><strong>{{ kader.username }}</strong></td>
+                <td>{{ kader.nama_lengkap }}</td>
+                <td>{{ kader.email }}</td>
+                <td>{{ kader.no_telepon or '-' }}</td>
+                <td>{{ kader.alamat or '-' }}</td>
+                <td>{{ kader.wilayah_posyandu or '-' }}</td>
+                <td>
+                  <form method="POST" class="action-buttons">
+                    <input type="hidden" name="kader_id" value="{{ kader.id_kader }}">
+                    <button type="submit" name="action" value="approve" class="btn-approve">
+                      <i class="fas fa-check"></i> Setujui
+                    </button>
+                    <button type="submit" name="action" value="reject" class="btn-reject" 
+                            onclick="return confirm('Yakin ingin menolak kader ini?')">
+                      <i class="fas fa-times"></i> Tolak
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-check-circle"></i>
+          <h3>Tidak Ada Kader Pending</h3>
+          <p>Semua kader telah disetujui atau tidak ada pendaftaran baru yang menunggu approval.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    const toggleBtn = document.querySelector('.toggle-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    const topHeader = document.querySelector('.top-header');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('closed');
+      mainContent.classList.toggle('fullwidth');
+      topHeader.classList.toggle('fullwidth-header');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !toggleBtn.contains(e.target) && 
+          !sidebar.classList.contains('closed')) {
+        sidebar.classList.add('closed');
+        mainContent.classList.add('fullwidth');
+        topHeader.classList.add('fullwidth-header');
+      }
+    });
+  </script>
+</body>
+</html>
