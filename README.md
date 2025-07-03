@@ -18,6 +18,7 @@ Aplikasi ini dikembangkan menggunakan Python (Flask), dengan integrasi layanan T
 - 💬 **Form Input Dinamis**: Formulir yang mudah diakses dan diisi pengguna.
 - 📈 **Visualisasi Data**: Grafik dan tabel analisis.
 - 🔒 **Autentikasi Pengguna**: Login dan hak akses.
+- 💬 **Appointment de=enganDokter** : Pembayaran dengan Midtrans
 
 ---
 
@@ -27,6 +28,7 @@ Aplikasi ini dikembangkan menggunakan Python (Flask), dengan integrasi layanan T
 - **Twilio API** (untuk SMS)
 - HTML, CSS, JavaScript (untuk frontend)
 - Git & GitHub
+- Midtrans untuk simulasi pembayaran dokter
 
 ---
 
