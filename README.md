@@ -6,7 +6,7 @@
 
 ## 📄 Deskripsi
 
-**Stunting-App** adalah aplikasi berbasis web yang dirancang untuk membantu monitoring, analisis, dan pengelolaan data terkait stunting pada anak.  
+**SiTumbuh** adalah aplikasi berbasis web yang dirancang untuk membantu monitoring, analisis, dan pengelolaan data terkait stunting pada anak.  
 Aplikasi ini dikembangkan menggunakan Python (Flask), dengan integrasi layanan Twilio untuk notifikasi.
 
 ---
